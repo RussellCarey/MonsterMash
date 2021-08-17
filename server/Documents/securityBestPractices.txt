@@ -1,0 +1,43 @@
+Best practices notes
+---------------------------------
+
+Common attacks
+---------------------------------
+
+Compromised data base: 
+    Strongly encrypt user passwords and their reset tokens so they cant change or steal their true passwords.
+
+Brute force attack: Attacker tries millions of PW
+    Use bcrypt to make login requests slow
+    Limit the amount of requests comming from one IP
+    Implement a max number of login attempts - then they have to wait.
+
+Cross site scritping attack - injects scripts into page
+    Store JWT in HTTP ONLY COOKIES
+    Sanitize user input data
+    Set special HTTP headers (helmet package)
+
+Denial of service attack: Sends many requests that it breaks down
+    Implement rate limiting (express-rate-limit)
+    Limit body payload
+    Avoid evilregular expressions - long running code?
+
+NOSQL Query injection
+    Use mongoose for mongo DB (schema types)
+    Sanatize user input data
+
+
+
+Best practices to improve auth
+---------------------------------
+    Always use HTTPS
+    Create random password reset tokens
+    Deny access to JWT after PW change
+    Dont GIT sensitive data 
+
+    Prevent cross site request forgery (csurf package)
+    Re auth before high value information - making a payment or deleteing something.
+    Blacklist of untrusted JWT - 
+    Confirm user email after first creating the account - Send a link to the email that actives the account.
+    Keep user logged in with refresh tokens - To remember users?
+    Two factor auth
