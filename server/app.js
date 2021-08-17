@@ -1,10 +1,10 @@
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
-
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
+
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
@@ -15,6 +15,7 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const cors = require("cors");
 
+const globalErrorHandler = require("./controllers/errorController");
 require("./controllers/twitterAuthController");
 
 const app = express();
@@ -74,6 +75,7 @@ app.use(express.urlencoded({ extended: false, limit: "20mb" }));
 // app.use("/api/users", userRoutes);
 app.use("/api/section", imageRoutes);
 app.use("/api/auth", authRoutes);
+app.use(globalErrorHandler);
 
 app.listen(process.env.DB_PORT || 2222, () => {
   console.log(process.env.NODE_ENV);

@@ -3,6 +3,8 @@ const passport = require("passport");
 const UserModel = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
 
+const response = require("../utils/responses");
+
 exports.checkTwitterIsLoggedIn = (req, res, next) => {
   req.user ? next() : res.status(401);
 };
@@ -56,10 +58,7 @@ exports.onTwitterCallback = async function (req, res) {
         token: token,
       });
   } catch (error) {
-    res.json({
-      status: "failed",
-      token: null,
-    });
+    response.sendFailedStatus(req, res, error);
   }
 };
 
@@ -72,9 +71,7 @@ exports.checkUserLoggedIn = async (req, res) => {
   }
 
   if (!req.user) {
-    res.json({
-      status: "failed",
-    });
+    response.sendFailedStatus(req, res, error);
   }
 };
 
