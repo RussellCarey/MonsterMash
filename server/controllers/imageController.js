@@ -1,9 +1,7 @@
 const SectionModel = require("../models/SectionModel");
 const ThreeSections = require("../models/ThreeSections");
-const twit = require("twit");
-const Jimp = require("jimp");
-const jimpController = require("./jimpController");
-
+const jimpController = require("../utils/jimpController");
+const AppError = require("../utils/AppError");
 const { v4: uuidv4, stringify } = require("uuid");
 
 const response = require("../utils/responses");
@@ -24,7 +22,7 @@ exports.uploadSection = async (req, res, next) => {
 
     response.sendSuccessData(req, res, section.sectionID);
   } catch (error) {
-    response.sendFailedStatus(req, res, error);
+    return next(new AppError("Failed to upload a section", 111));
   }
 };
 
@@ -40,7 +38,7 @@ exports.getRandomSection = async (req, res, next) => {
 
     response.sendSuccessData(req, res, choice);
   } catch (error) {
-    response.sendFailedStatus(req, res, error);
+    return next(new AppError("Failed to get a random section", 111));
   }
 };
 
@@ -50,22 +48,25 @@ exports.getSection = async (req, res, next) => {
     const found = await SectionModel.findOne({ sectionID: id });
 
     if (!found) {
-      response.sendFailedStatus(req, res);
+      return next(new AppError("Failed to get a section", 111));
     } else {
       response.sendSuccessData(req, res, found);
     }
   } catch (error) {
-    response.sendFailedStatus(req, res, error);
+    return next(new AppError("Failed in getting a section", 111));
   }
 };
 
 //! Check if we are logged in on a protected page.
 exports.getUserImages = async (req, res, next) => {
   const username = req.body.data;
-  if (!username) response.sendFailedStatus(req, res);
+  if (!username) return new AppError("Couldnt find the user", 111);
 
   try {
-    const images = await SectionModel.find({ username: username });
+    const images = await SectionModel.find({ username: "sdfsdfsdf" });
+    if (!images || images.length === 0 || images == null)
+      return next(new AppError("Couldnt find the users sections ", 111));
+
     const foundImages = images.splice(0, 3);
 
     if (foundImages.length === 0) {
@@ -74,7 +75,7 @@ exports.getUserImages = async (req, res, next) => {
       response.sendSuccessData(req, res, foundImages);
     }
   } catch (error) {
-    response.sendFailedStatus(req, res, error);
+    return next(new AppError("Failed in getting the users images. ", 111));
   }
 };
 
@@ -116,7 +117,7 @@ exports.combineUserImages = async (req, res, next) => {
 
     response.sendSuccessData(req, res, combinedImage);
   } catch (error) {
-    response.sendFailedStatus(req, res, error);
+    return next(new AppError("Error in combing images ", 111));
   }
 };
 

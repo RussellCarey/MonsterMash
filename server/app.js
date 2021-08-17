@@ -18,10 +18,12 @@ const cors = require("cors");
 const globalErrorHandler = require("./controllers/errorController");
 require("./controllers/twitterAuthController");
 
+const authRoutes = require("./routes/authRoutes");
+const imageRoutes = require("./routes/imageRoutes");
+
 const app = express();
 
-app.use(cookieParser());
-
+// Set session for the passport process
 app.use(
   session({
     secret: "cats",
@@ -43,27 +45,23 @@ app.use(
   })
 );
 
-const authRoutes = require("./routes/authRoutes");
-const imageRoutes = require("./routes/imageRoutes");
-
 //? Notes
 //? This limiter will limit an IPs amount of times it can make a request per window if time.
-const limiter = rateLimit({
-  max: 50,
-  windowMs: 60 * 60 * 1000,
-  message:
-    "You have made too many requests from this IP. Please try again in 60 minutes.",
-});
-
-// //? Setting some misc useful headers - check doc for more options
-// app.use(helmet());
+// const limiter = rateLimit({
+//   max: 50,
+//   windowMs: 60 * 60 * 1000,
+//   message:
+//     "You have made too many requests from this IP. Please try again in 60 minutes.",
+// });
 
 // //? Limit request
 // app.use("/api", limiter);
 
 // //? Body parsers
+// app.use(helmet());
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: false, limit: "20mb" }));
+app.use(cookieParser());
 
 // //? Data sanitization against NoSQL query injects - checks body etc and filter out dollar signs and dots - removes mongo db operators
 // app.use(mongoSanitize());

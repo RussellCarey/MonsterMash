@@ -18,7 +18,7 @@ module.exports = (err, req, res, next) => {
         "Something unusual seems to have occured. Please try again or contact us if it persists!";
     }
 
-    //! Render an error page.. or something..
+    // In production throw user to error page if it warrents it
     return res.status(err.statusCode).render("errorPage", {
       title: "Error",
       errorCode: err.statusCode,
@@ -27,7 +27,8 @@ module.exports = (err, req, res, next) => {
   }
 
   if (process.env.NODE_ENV === "development") {
-    const errorMessage = error.message;
-    return next(new AppError(`Something went wrong!::: ${errorMessage}, 111`));
+    console.log(err.message);
+    const errorMessage = err.message;
+    return next(new AppError(`Something went wrong! ${errorMessage}, 111`));
   }
 };

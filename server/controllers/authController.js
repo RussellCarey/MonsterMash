@@ -4,27 +4,33 @@ const UserModel = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
 
 const response = require("../utils/responses");
+const AppError = require("../utils/AppError");
 
 exports.checkTwitterIsLoggedIn = (req, res, next) => {
-  req.user ? next() : res.status(401);
+  if (req.user) {
+    next();
+  } else {
+    return next(new AppError("User not logged in", 302));
+  }
 };
 
 exports.checkJWTAndSetUser = async (req, res, next) => {
   // Get cookie from header
   const token = req.headers.authorization;
+  if (!token) return next(new AppError("Didnt find a token", 302));
 
   // Verify
   const data = await jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) res.json({ status: "failed" });
+    if (err) return next(new AppError("Failed in verifying token", 111));
     req.user = user;
-
     next();
   });
 };
 
 exports.onTwitterCallback = async function (req, res) {
   try {
-    // sign req.user..
+    if (!req.user) return next(new AppError("Couldnt verify user", 111));
+
     const minifiedUser = {
       id: req.user.id,
       username: req.user.username,
@@ -71,7 +77,10 @@ exports.checkUserLoggedIn = async (req, res) => {
   }
 
   if (!req.user) {
-    response.sendFailedStatus(req, res, error);
+    res.set("location", "http://127.0.0.1:3000");
+    res.json({
+      status: "failed",
+    });
   }
 };
 

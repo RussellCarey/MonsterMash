@@ -1,3 +1,5 @@
+const AppError = require("../utils/AppError");
+
 exports.sendSuccessData = (req, res, data) => {
   res.json({
     status: "success",
@@ -6,8 +8,5 @@ exports.sendSuccessData = (req, res, data) => {
 };
 
 exports.sendFailedStatus = (req, res, error, data) => {
-  console.dir(error || "Error occured");
-  res.json({
-    status: "failed",
-  });
+  return new AppError("Generic caught error", 302);
 };
