@@ -1,6 +1,5 @@
 const express = require("express");
 const passport = require("passport");
-const UserModel = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
 
 const authController = require("../controllers/authController");

@@ -6,7 +6,3 @@ exports.sendSuccessData = (req, res, data) => {
     data: data,
   });
 };
-
-exports.sendFailedStatus = (req, res, error, data) => {
-  return new AppError("Generic caught error", 302);
-};

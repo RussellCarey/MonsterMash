@@ -6,6 +6,8 @@ class AppError extends Error {
     this.statusCode = statusCode;
     this.status = `${statusCode}`.startsWith("4") ? "fail" : "Error";
     this.customMessage = message;
+
+    // Signifies that he error is creatred by us to catch something not  random programming error etc.
     this.isOperational = true;
 
     // Not add to the stack trace and pollute it.

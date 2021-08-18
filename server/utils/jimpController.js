@@ -26,7 +26,6 @@ exports.createBlankCanvas = async (width, height) => {
 exports.combineImagesIntoOne = async (imagesArray, blankCanvas) => {
   // Composite the resized images onto the blank image, convert it to a base ^$ and send it back to the client.
   const image = await Jimp.read(blankCanvas).then(async (image) => {
-    console.log("Trying to composite image");
     let img;
     img = await image.composite(imagesArray[0], 0, 0);
     img = await image.composite(imagesArray[1], 0, 225);

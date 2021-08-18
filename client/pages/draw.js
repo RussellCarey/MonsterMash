@@ -81,6 +81,7 @@ function Draw({ userData }) {
   const [brushWidth, setBrushWidth] = useState(4);
   const [sectionType, setSectionType] = useState();
   const [message, setMessage] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const CanvasRef = useRef();
 
@@ -120,6 +121,7 @@ function Draw({ userData }) {
 
   // Uploads the image to the database
   const submitImageToDatabase = async () => {
+    setLoading(true);
     const imageString = await getPNGString();
 
     const submitID = await submitSectionToDatabase(
@@ -153,6 +155,11 @@ function Draw({ userData }) {
       {message && (
         <MessageWindow>
           <Message>{`You are drawing the ${sectionType}! Make sure to connect the guide lines and draw away!`}</Message>
+        </MessageWindow>
+      )}
+      {loading && (
+        <MessageWindow>
+          <Message>{`Submiting and loading your monster!`}</Message>
         </MessageWindow>
       )}
       <Container>

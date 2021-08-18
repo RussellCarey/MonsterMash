@@ -1,4 +1,5 @@
 const twit = require("twit");
+const catchAsync = require("../utils/catchAsync");
 
 const Twitter = new twit({
   consumer_key: process.env.CONSUMER_API,
@@ -8,37 +9,20 @@ const Twitter = new twit({
   timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
 });
 
-exports.postImageTweet = async (image) => {
-  console.log("running twtiter poster");
-  try {
-    await Twitter.post(
-      "media/upload",
-      {
-        media_data: image,
-      },
-      async function (err, data, response) {
-        if (err) return console.log(err);
+exports.postImageTweet = catchAsync(async (image) => {
+  // Upload a base 64 image first to the database
+  const newMediaPost = await Twitter.post("media/upload", {
+    media_data: image,
+  });
 
-        const string = data.media_id_string;
-        await Twitter.post(
-          "statuses/update",
-          {
-            status: `Created and sent from my in progress monster making game. Testing 123!`,
-            media_ids: [string],
-          },
-          async function (err, data, response) {
-            if (!err) {
-              console.log("worked");
-            }
-            if (err) {
-              console.log("didnt work");
-              console.log(err);
-            }
-          }
-        );
-      }
-    );
-  } catch (error) {
-    response.sendFailedStatus(req, res, error);
-  }
-};
+  if (!newMediaPost) return;
+
+  // Get the string ID of that image once returned
+  const dataMediaString = newMediaPost.data.media_id_string;
+
+  // Post status with connection to the image uploaded
+  const fullPost = await Twitter.post("statuses/update", {
+    status: `Created and sent from my in progress monster making game. Testing 123!`,
+    media_ids: [dataMediaString],
+  });
+});
