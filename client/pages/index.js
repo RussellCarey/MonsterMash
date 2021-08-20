@@ -6,9 +6,13 @@ import Navbar from "../components/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 
-import axios from "axios";
-
 import { hostAddress, serverAddress } from "../data/env";
+
+import {
+  checkLoggedIn,
+  getUsersImages,
+  returnProps,
+} from "./services/IndexServices";
 
 const Container = styled.div`
   padding-top: ${(props) => props.mt};
@@ -137,73 +141,34 @@ function Home({ userData, images }) {
 }
 
 export async function getServerSideProps({ res, req, params }) {
-  // If no cookie, then stop proceeding...
   if (!req.cookies.token) {
-    return {
-      props: {
-        userData: null,
-      },
-    };
+    return returnProps(null, null, null);
   }
 
   const jwt = req.cookies.token;
 
-  let userData;
-  let imagesReq;
-
   try {
-    // Send request with the token FROM the cookie in the auth header
-    const req = await axios.request({
-      method: "GET",
-      url: `${serverAddress}/api/auth/twitter/isloggedin`,
-      headers: {
-        Authorization: jwt,
-      },
-    });
+    const req = await checkLoggedIn(jwt);
 
-    // If we are not okay, redirect back to the home page or create an error page
     if (!req || req.data.status !== "success") {
-      return {
-        props: {
-          userData: null,
-        },
-      };
+      return returnProps(null, null, null);
     }
 
-    userData = req.data.data;
+    const userData = req.data.data;
+    const imageRequest = await getUsersImages(jwt, userData);
 
-    imagesReq = await axios.request({
-      method: "POST",
-      url: `${serverAddress}/api/section/get/usersections`,
-      data: {
-        data: userData.username,
-      },
-      headers: {
-        Authorization: jwt,
-      },
-    });
-
-    if (!imagesReq) {
-      return {
-        props: {
-          userData: null,
-        },
-      };
+    if (imageRequest.data.status !== "success") {
+      return returnProps(null, null, null);
     }
 
     return {
       props: {
         userData,
-        images: imagesReq.data.data,
+        images: imageRequest.data.data,
       },
     };
   } catch (error) {
-    return {
-      props: {
-        userData: null,
-        images: null,
-      },
-    };
+    return returnProps(null, null, null);
   }
 }
 

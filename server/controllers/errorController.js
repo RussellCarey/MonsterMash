@@ -27,8 +27,8 @@ module.exports = (err, req, res, next) => {
   }
 
   if (process.env.NODE_ENV === "development") {
-    console.log(err.message);
+    console.log(err.stack);
     const errorMessage = err.message;
-    return next(new AppError(`Something went wrong! ${errorMessage}, 111`));
+    return;
   }
 };

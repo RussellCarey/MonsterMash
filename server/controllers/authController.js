@@ -1,11 +1,9 @@
-const express = require("express");
-const passport = require("passport");
-const UserModel = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
 
 const response = require("../utils/responses");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
+const authService = require("../services/authService");
 
 exports.checkTwitterIsLoggedIn = (req, res, next) => {
   if (req.user) {
@@ -16,11 +14,9 @@ exports.checkTwitterIsLoggedIn = (req, res, next) => {
 };
 
 exports.checkJWTAndSetUser = catchAsync(async (req, res, next) => {
-  // Get cookie from header
   const token = req.headers.authorization;
   if (!token) return next(new AppError("Didnt find a token", 302));
 
-  // Verify
   const data = await jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return next(new AppError("Failed in verifying token", 111));
     req.user = user;
@@ -31,7 +27,7 @@ exports.checkJWTAndSetUser = catchAsync(async (req, res, next) => {
 exports.onTwitterCallback = catchAsync(async (req, res) => {
   if (!req.user) return next(new AppError("Couldnt verify user", 111));
 
-  const minifiedUser = {
+  const userObjectFromReq = {
     id: req.user.id,
     username: req.user.username,
     displayName: req.user.displayName,
@@ -39,20 +35,10 @@ exports.onTwitterCallback = catchAsync(async (req, res) => {
     profileImage: req.user.photos[0].value,
   };
 
-  //! Check if user exists - if they do skip - if not add to the database
-  const found = await UserModel.findOne({ email: minifiedUser.email });
-  if (!found) {
-    const newUser = await new UserModel();
-    newUser.username = minifiedUser.username;
-    newUser.displayName = minifiedUser.displayName;
-    newUser.email = minifiedUser.email;
-    newUser.profileImage = minifiedUser.profileImage;
-    await newUser.save();
-  }
+  const foundUser = authService.findOneUser(userObjectFromReq);
+  if (!foundUser) authService.createNewUser(userObjectFromReq);
+  const token = await jwt.sign(userObjectFromReq, process.env.JWT_SECRET);
 
-  const token = await jwt.sign(minifiedUser, process.env.JWT_SECRET);
-
-  // Successful authentication, redirect home.
   res.set("location", "http://127.0.0.1:3000");
   res
     .cookie("token", token, {
@@ -67,7 +53,7 @@ exports.onTwitterCallback = catchAsync(async (req, res) => {
 
 exports.checkUserLoggedIn = catchAsync(async (req, res) => {
   if (req.user) {
-    response.sendSuccessData(req.user);
+    response.sendSuccessData(req, res, req.user);
   }
 
   if (!req.user) {

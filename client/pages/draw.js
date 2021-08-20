@@ -13,6 +13,7 @@ import styled from "styled-components";
 import ColorSwatches from "../components/ColorSwatches";
 
 import { serverAddress, hostAddress } from "../data/env";
+import { checkLoggedIn, returnProps } from "./services/IndexServices";
 
 const Container = styled.div`
   width: 100vw;
@@ -49,8 +50,12 @@ const MessageWindow = styled.div`
   align-items: center;
 `;
 
-const Message = styled.h2`
-  color: white;
+const Message = styled.h3`
+  color: black;
+  background-color: white;
+  border: solid 3px black;
+  padding: 20px 30px;
+  border-radius: 15px;
 `;
 
 const Button = styled.button`
@@ -84,7 +89,6 @@ function Draw({ userData }) {
   const [loading, setLoading] = useState(false);
 
   const CanvasRef = useRef();
-
   const router = useRouter();
 
   useEffect(() => {
@@ -154,7 +158,7 @@ function Draw({ userData }) {
     <Fragment>
       {message && (
         <MessageWindow>
-          <Message>{`You are drawing the ${sectionType}! Make sure to connect the guide lines and draw away!`}</Message>
+          <Message>{`You are drawing the ${sectionType}..!  Make sure to connect the red guide lines!`}</Message>
         </MessageWindow>
       )}
       {loading && (
@@ -181,6 +185,7 @@ function Draw({ userData }) {
 
 export async function getServerSideProps({ res, req, params }) {
   const jwt = req.cookies.token;
+  let userData;
 
   // Redirect the user back to the home page if there is no login
   if (!jwt) {
@@ -189,37 +194,22 @@ export async function getServerSideProps({ res, req, params }) {
     res.end();
   }
 
-  let userData;
-
   try {
     // Send request with the token FROM the cookie in the auth header
-    const req = await axios.request({
-      method: "GET",
-      url: `${serverAddress}/api/auth/twitter/isloggedin`,
-      headers: {
-        Authorization: jwt,
-      },
-    });
+    const req = await checkLoggedIn(jwt);
 
     // If we are not okay, redirect back to the home page or create an error page
     if (req.data.status !== "success") {
-      userData = null;
       res.setHeader("location", `${hostAddress}`);
-      res.statusCode = 302;
       res.end();
     }
 
     userData = req.data.data;
   } catch (error) {
-    console.log(error);
+    return returnProps(null, userData, null);
   }
 
-  // Return the user data we gathered to be used.
-  return {
-    props: {
-      userData,
-    },
-  };
+  return returnProps(null, userData, null);
 }
 
 export default Draw;

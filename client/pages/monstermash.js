@@ -1,7 +1,14 @@
 import axios from "axios";
 import React, { Fragment, useState } from "react";
 import styled from "styled-components";
-import Navbar from "../components/Navbar";
+
+import {
+  getTypeImage,
+  createFullImage,
+  createCombinationToTwitter,
+  getUsersDrawing,
+} from "./services/monsterMashServices";
+import { returnProps } from "./services/IndexServices";
 
 const Container = styled.div`
   width: 100vw;
@@ -126,66 +133,22 @@ export default function Mash({ data }) {
 }
 
 export async function getServerSideProps({ res, req, query }) {
-  let fullImage;
-  let imageData;
+  const imageData = await getUsersDrawing(query, query.drawingID);
+  if (imageData.status !== "success") return returnProps(null, null, null);
+  const usersImageData = imageData.data;
 
-  // Util functions to get random images
-  const getTypeImage = async (data, type) => {
-    if (data.sectionType !== type || !data) {
-      const req = await axios.get(
-        `http://localhost:2222/api/section/get/${type}`
-      );
-      return req.data.data;
-    } else {
-      return data;
-    }
-  };
+  const headSectionData = await getTypeImage(usersImageData, "head");
+  const bodySectionData = await getTypeImage(usersImageData, "body");
+  const legsSectionData = await getTypeImage(usersImageData, "legs");
 
-  // Check if we have a query - if we do we need to get that drawing from the DB
-  if (Object.keys(query).length > 0) {
-    const res = await axios.get(
-      `http://localhost:2222/api/section/get/section/${query.drawingID}`
-    );
-
-    if (res.data.status === "failed" || res === null)
-      return {
-        props: {
-          data: null,
-        },
-      };
-
-    imageData = res.data.data;
-  }
-
-  const headSectionData = await getTypeImage(imageData, "head");
-  const bodySectionData = await getTypeImage(imageData, "body");
-  const legsSectionData = await getTypeImage(imageData, "legs");
-
-  fullImage = {
-    head: headSectionData.imageString,
-    body: bodySectionData.imageString,
-    legs: legsSectionData.imageString,
-    headID: headSectionData.sectionID,
-    bodyID: bodySectionData.sectionID,
-    legsID: legsSectionData.sectionID,
-    headUsername: headSectionData.username,
-    bodyUsername: bodySectionData.username,
-    legsUsername: legsSectionData.username,
-  };
+  const fullImage = createFullImage(
+    headSectionData,
+    bodySectionData,
+    legsSectionData
+  );
 
   // If we have a query - upload 3 parts of the image to the DB to check if it exists and to save / publish to twitter
-  //! Add some message incase it fails..
-  if (Object.keys(query).length > 0) {
-    const imageUpload = await axios.post(
-      `http://localhost:2222/api/section//get/combineSections`,
-      fullImage
-    );
-  }
+  const combination = createCombinationToTwitter(query, fullImage);
 
-  // Return the user data we gathered to be used.
-  return {
-    props: {
-      data: fullImage,
-    },
-  };
+  return returnProps(fullImage, null, null);
 }

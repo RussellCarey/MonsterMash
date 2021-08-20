@@ -13,6 +13,12 @@ const ThreeSectionsModel = new mongoose.Schema({
   legsID: {
     type: String,
   },
+  numberOfLikes: {
+    type: Number,
+  },
+  usersLiked: {
+    type: Array,
+  },
 });
 
 const ThreeSections = mongoose.model("ThreeSections", ThreeSectionsModel);
