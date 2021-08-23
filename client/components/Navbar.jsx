@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import { hostAddress, serverAddress } from "../data/env";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -32,6 +32,7 @@ const Button = styled.button`
 
   border: solid 3px black;
   padding: 20px 30px;
+  margin-left: 10px;
 
   border-radius: 15px;
 
@@ -59,6 +60,11 @@ const Icon = styled(FontAwesomeIcon)`
   margin-right: 10px;
 `;
 
+const Text = styled.p`
+  margin-bottom: 40px;
+  line-height: 20px;
+`;
+
 const ProfileImage = styled.img`
   width: 50px;
   height: 50px;
@@ -79,25 +85,58 @@ const LogoArea = styled.div`
   cursor: pointer;
 `;
 
+const ButtonsArea = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: max-content;
+  flex-direction: row;
+
+  cursor: pointer;
+`;
+
 export default function Navbar({ children, userData, drawings }) {
   const [showUserImages, setShowUserImages] = useState(false);
-
+  console.log(userData);
   const clickHandler = () => {
     setShowUserImages(!showUserImages);
   };
 
   return (
     <Container>
-      <LogoArea>
-        <ProfileImage onClick={clickHandler} src={userData.profileImage} />
-        <Name>Hi {userData.displayName}!</Name>
-      </LogoArea>
-      <a href={`${serverAddress}/api/auth/logout`}>
-        <Button>
-          <Icon icon={faTwitter} />
-          Logout
-        </Button>
-      </a>
+      {userData ? (
+        <LogoArea>
+          <ProfileImage onClick={clickHandler} src={userData.profileImage} />
+          <Name>Hi {userData.displayName}!</Name>
+        </LogoArea>
+      ) : (
+        <Text>Monster Mash</Text>
+      )}
+
+      {!userData ? (
+        <a href={`${serverAddress}/api/auth/twitter`}>
+          <Button>
+            <Icon icon={faTwitter} />
+            Login with twitter
+          </Button>
+        </a>
+      ) : (
+        <ButtonsArea>
+          <a href={`${hostAddress}/draw`}>
+            <Button>Let's Draw!</Button>
+          </a>
+          <a href={`${hostAddress}/monstermash`}>
+            <Button>View Random!</Button>
+          </a>
+          <a href={`${serverAddress}/api/auth/logout`}>
+            <Button>
+              <Icon icon={faTwitter} />
+              Logout
+            </Button>
+          </a>
+        </ButtonsArea>
+      )}
+
       {showUserImages && <UserDrawingList drawings={drawings} />}
     </Container>
   );

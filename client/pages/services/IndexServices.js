@@ -10,7 +10,7 @@ export const checkLoggedIn = async (jwt) => {
     },
   });
 
-  return req;
+  return req.data.data;
 };
 
 export const getUsersImages = async (jwt, data) => {
@@ -25,15 +25,29 @@ export const getUsersImages = async (jwt, data) => {
     },
   });
 
-  return req;
+  return req.data.data;
 };
 
-export const returnProps = (data, userData, images) => {
+export const getRecentImages = async () => {
+  try {
+    const req = await axios.request({
+      method: "POST",
+      url: `${serverAddress}/api/section/get/recentUploads`,
+    });
+
+    return req.data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const returnProps = (data, userData, images, recentImages) => {
   return {
     props: {
       data: data,
       userData: userData,
       images: images,
+      recentImages: recentImages,
     },
   };
 };

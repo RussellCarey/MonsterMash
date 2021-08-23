@@ -9,7 +9,7 @@ const Twitter = new twit({
   timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
 });
 
-exports.postImageTweet = catchAsync(async (image) => {
+const postImageTweet = catchAsync(async (image, data) => {
   // Upload a base 64 image first to the database
   const newMediaPost = await Twitter.post("media/upload", {
     media_data: image,
@@ -22,7 +22,14 @@ exports.postImageTweet = catchAsync(async (image) => {
 
   // Post status with connection to the image uploaded
   const fullPost = await Twitter.post("statuses/update", {
-    status: `Created and sent from my in progress monster making game. Testing 123!`,
+    status: `Wow what a masterpeice! Head by @${data.headUsername}, Body by @${data.bodyUsername} and Legs by @${data.legsUsername}! Check out more monsters and create your own at {url here}.`,
     media_ids: [dataMediaString],
   });
 });
+
+exports.uploadBaseImageToTwitter = (finalImage64, data) => {
+  const twitterPost = postImageTweet(
+    finalImage64.split(";base64,").pop(),
+    data
+  );
+};

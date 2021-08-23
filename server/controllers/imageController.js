@@ -1,10 +1,9 @@
-const jimpController = require("../utils/jimpController");
-
 const response = require("../utils/responses");
 const catchAsync = require("../utils/catchAsync");
-const tweet = require("../utils/tweet");
-
+const tweet = require("./tweetController");
+const jimpController = require("./jimpController");
 const imageService = require("../services/imageService");
+const imageUploadController = require("../controllers/imageUploadController");
 
 // Upload users single section to the database..
 exports.uploadSection = catchAsync(async (req, res, next) => {
@@ -23,45 +22,59 @@ exports.getSection = catchAsync(async (req, res, next) => {
 });
 
 exports.getUserImages = catchAsync(async (req, res, next) => {
-  const userImages = imageService.getUsersImages(req, next);
+  const userImages = await imageService.getUsersImages(req, next);
   response.sendSuccessData(req, res, userImages);
 });
 
+exports.getRecentUploads = catchAsync(async (req, res, next) => {
+  const recentImages = await imageService.getRecentCreations(req);
+  response.sendSuccessData(req, res, recentImages);
+});
+
+// Combine sections one one and SUBMIT TO TWITTER..
 exports.combineUserImages = catchAsync(async (req, res, next) => {
   if (!req.body) return;
 
+  // Check if the combination create exists
   const found = await imageService.findByThreeIds(req.body);
 
+  // If not create a new model and upload the image to the db and twitter.
   if (!found) {
-    const newCombination = await imageService.uploadNewThreeSections(req.body);
-    const combinedImage = await prepareImagesForTwitterAndSend(req.body);
-    return;
+    // Create an email that is a base 64 string for the twitter upload..
+    const combinedImage64 = await jimpController.createCombinedBufferOrImage(
+      req.body,
+      false,
+      900,
+      1600
+    );
+
+    // Create a PNG to upload to the file server to use for the shite.
+    const combinedImageBuffer = await jimpController.createCombinedBufferOrImage(
+      req.body,
+      true,
+      900,
+      1600
+    );
+
+    console.log(combinedImageBuffer);
+
+    // Upload Image file to the space
+    const imageUpload = await imageUploadController.uploadImage(
+      combinedImageBuffer
+    );
+
+    // Upload this combination to the DB to check in the future..
+    const newCombination = await imageService.uploadNewThreeSections(
+      req.body,
+      imageUpload
+    );
+
+    // Upload base 64 string from above to twitter.
+    const twitterUpload = tweet.uploadBaseImageToTwitter(
+      combinedImage64,
+      req.body
+    );
   }
 
   return;
-});
-
-const prepareImagesForTwitterAndSend = catchAsync(async (images) => {
-  const head = jimpController.decodeBase64Image(images.head);
-  const body = jimpController.decodeBase64Image(images.body);
-  const legs = jimpController.decodeBase64Image(images.legs);
-
-  // Resize images read to be made into  the new image
-  const headResized = await jimpController.resizeImage(head);
-  const bodyResized = await jimpController.resizeImage(body);
-  const legsResized = await jimpController.resizeImage(legs);
-
-  // Create a blank image to paste the new images
-  const blankCanvas = await jimpController.createBlankCanvas(400, 675);
-
-  const finalImage = await jimpController.combineImagesIntoOne(
-    [headResized, bodyResized, legsResized],
-    blankCanvas
-  );
-
-  const twitterPost = await tweet.postImageTweet(
-    finalImage.split(";base64,").pop()
-  );
-
-  return finalImage;
 });

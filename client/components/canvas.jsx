@@ -67,6 +67,7 @@ export default function Canvas({
 
   const getTotalSketchingTime = async () => {
     const time = await canvasRef.current.getSketchingTime();
+    console.log(time);
   };
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function Canvas({
       if (e.key === "z") undoLastAction();
       if (e.key === "r") redoLastAction();
       if (e.key === "c") clearCanvas();
+      if (e.key === "t") getTotalSketchingTime();
     });
   }, []);
 
@@ -94,6 +96,7 @@ export default function Canvas({
         style={styles}
         strokeWidth={strokeWidth}
         strokeColor={strokeColor}
+        withTimestamp={true}
       />
 
       {sectionType === "head" && (

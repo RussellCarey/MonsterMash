@@ -13,11 +13,18 @@ const ThreeSectionsModel = new mongoose.Schema({
   legsID: {
     type: String,
   },
-  numberOfLikes: {
-    type: Number,
+  imageURL: {
+    type: String,
+  },
+  date: {
+    type: Date,
+    default: Date.now(),
   },
   usersLiked: {
     type: Array,
+  },
+  isLiked: {
+    type: Boolean,
   },
 });
 

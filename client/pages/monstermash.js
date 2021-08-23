@@ -7,7 +7,7 @@ import {
   createFullImage,
   createCombinationToTwitter,
   getUsersDrawing,
-} from "./services/monsterMashServices";
+} from "./services/MonsterMashServices";
 import { returnProps } from "./services/IndexServices";
 
 const Container = styled.div`
@@ -133,14 +133,18 @@ export default function Mash({ data }) {
 }
 
 export async function getServerSideProps({ res, req, query }) {
+  // Get the drawing from the param in the URL
   const imageData = await getUsersDrawing(query, query.drawingID);
-  if (imageData.status !== "success") return returnProps(null, null, null);
-  const usersImageData = imageData.data;
 
+  // If not URL return nothing.
+  const usersImageData = imageData ? imageData.data : "";
+
+  // Get the secrtion from the URL or if not correct type, or no URL get random.
   const headSectionData = await getTypeImage(usersImageData, "head");
   const bodySectionData = await getTypeImage(usersImageData, "body");
   const legsSectionData = await getTypeImage(usersImageData, "legs");
 
+  // Create image
   const fullImage = createFullImage(
     headSectionData,
     bodySectionData,
@@ -150,5 +154,5 @@ export async function getServerSideProps({ res, req, query }) {
   // If we have a query - upload 3 parts of the image to the DB to check if it exists and to save / publish to twitter
   const combination = createCombinationToTwitter(query, fullImage);
 
-  return returnProps(fullImage, null, null);
+  return returnProps(fullImage, null, null, null);
 }

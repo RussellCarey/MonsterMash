@@ -37,11 +37,42 @@ exports.getSectionByID = async (req, next) => {
 exports.getUsersImages = async (req, next) => {
   const username = req.body.data;
   if (!username) return new AppError("Couldnt find the user", 111);
-  const images = await SectionModel.find({ username: username });
-  if (!images || images.length === 0 || images == null)
-    return next(new AppError("Couldnt find the users sections ", 111));
+  const images = await SectionModel.find({ username: username }).sort({
+    date: -1,
+  });
+  if (!images || images.length === 0 || images == null) return [];
 
   const foundImages = images.splice(0, 3);
+  return foundImages;
+};
+
+exports.getRecentCreations = async (req, next) => {
+  // Find all complete items //! SKIP?
+  const foundItems = await ThreeSections.find().sort({ date: -1 });
+
+  // If not items return empty;
+  if (!foundItems || foundItems.length === 0) return [];
+
+  // Get first 6 items
+  const clippedItems = foundItems.splice(0, 12);
+
+  //! Attempt to intrduce a form a like function.
+  // // Get current user
+  // const currentUser = req.body.data;
+
+  // // If user not logged in stop here and return the normal results
+  // if (!currentUser || currentUser === "") return clippedItems;
+
+  // // CHeck if any have been liked by the user, if so add that to the object sent to the browser to show.
+  // const checkedLikes = clippedItems.map((img) => {
+  //   if (img.usersLiked.includes(currentUser)) {
+  //     img.isLiked = true;
+  //   }
+  //   return img;
+  // });
+
+  // Return
+  return clippedItems;
 };
 
 exports.findByThreeIds = async (data) => {
@@ -54,7 +85,7 @@ exports.findByThreeIds = async (data) => {
   return found;
 };
 
-exports.uploadNewThreeSections = async (data) => {
+exports.uploadNewThreeSections = async (data, url) => {
   // Create a full section on the database to check against in the future.
   const newSections = await new ThreeSections();
   newSections.displayNames = [
@@ -62,10 +93,10 @@ exports.uploadNewThreeSections = async (data) => {
     data.bodyUsername,
     data.legsUsername,
   ];
-
   newSections.headID = data.headID;
   newSections.bodyID = data.bodyID;
   newSections.legsID = data.legsID;
+  newSections.imageURL = url;
   await newSections.save();
   return newSections;
 };

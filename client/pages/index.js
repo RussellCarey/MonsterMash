@@ -3,22 +3,19 @@ import styled from "styled-components";
 
 import Navbar from "../components/Navbar";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTwitter } from "@fortawesome/free-brands-svg-icons";
-
-import { hostAddress, serverAddress } from "../data/env";
-
 import {
   checkLoggedIn,
   getUsersImages,
   returnProps,
+  getRecentImages,
 } from "./services/IndexServices";
+import CombinationCard from "../components/CombinationCard";
 
 const Container = styled.div`
-  padding-top: ${(props) => props.mt};
-
   width: 100vw;
-  height: 100vh;
+  height: max-content;
+  min-height: 100vh;
+  padding: ${(props) => props.mt};
 
   overflow: hidden !important;
 
@@ -31,60 +28,25 @@ const Container = styled.div`
 `;
 
 const MainArea = styled.div`
-  width: 70%;
-  height: 70%;
-
-  background-color: white;
-  border-radius: 15px;
-
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  border: solid 3px black;
-`;
-
-const Section = styled.div`
   width: 100%;
-  padding: 50px 100px;
+  height: max-content;
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
-  text-align: center;
-`;
-
-const Button = styled.button`
-  width: max-content;
-  height: 20px;
-
-  border: solid 3px black;
-  padding: 20px 30px;
+  padding: 30px;
 
   border-radius: 15px;
 
-  color: white;
-  background-color: rgb(20, 186, 254);
-
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
-  margin-bottom: ${(props) => props.mb};
-
-  &:hover {
-    cursor: pointer;
-  }
+  flex-wrap: wrap;
 `;
 
-const Icon = styled(FontAwesomeIcon)`
-  font-size: 20px;
-  color: white;
-  margin-right: 10px;
+const Subtitle = styled.h4`
+  background-color: white;
+  border: solid 3px black;
+  border-radius: 15px;
+  padding: 20px;
 `;
 
 const Text = styled.p`
@@ -92,7 +54,7 @@ const Text = styled.p`
   line-height: 20px;
 `;
 
-function Home({ userData, images }) {
+function Home({ userData, images, recentImages }) {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -102,73 +64,51 @@ function Home({ userData, images }) {
   }, []);
 
   return (
-    <Container mt={loggedIn ? "40px" : 0}>
-      {loggedIn && <Navbar userData={userData} drawings={images} />}
-
+    <Container mt={loggedIn ? "100px" : "100px"}>
+      <Navbar userData={userData} drawings={images} />
+      <Subtitle>Recent monster concoctions!</Subtitle>
       <MainArea>
-        <Section>
-          <h1>Welcome to Monster Mash!</h1>
-          <Text>
-            Draw one section of a monster and join it with those that somone
-            else has already created! If you dont want to draw then just be a
-            guest and view other peopls randomly joined monster creations!
-          </Text>
-          <Text>
-            Press you profile image on the top left to see your last 3 drawings.
-            Click the drawings to randomly pair with with some more body parts!
-          </Text>
-
-          {!loggedIn ? (
-            <a href={`${serverAddress}/api/auth/twitter`}>
-              <Button mb={"10px"}>
-                <Icon icon={faTwitter} />
-                Login with twitter
-              </Button>
-            </a>
-          ) : (
-            <a href={`${hostAddress}/draw`}>
-              <Button mb={"10px"}>Let's Draw!</Button>
-            </a>
-          )}
-
-          <a href={`${hostAddress}/monstermash`}>
-            <Button mb={"10px"}>View Random!</Button>
-          </a>
-        </Section>
+        {recentImages &&
+          recentImages.map((data) => {
+            return <CombinationCard data={data} />;
+          })}
       </MainArea>
     </Container>
   );
 }
 
 export async function getServerSideProps({ res, req, params }) {
-  if (!req.cookies.token) {
-    return returnProps(null, null, null);
-  }
+  let userData;
+  let images;
+  let recentImages;
 
+  // Get recent images on the DB
+  recentImages = await getRecentImages();
+
+  // Check if we have a JWT token saved
   const jwt = req.cookies.token;
 
+  // If not only return the recent images and not the users information or images
+  if (!jwt) return returnProps(null, null, null, recentImages);
+
   try {
+    // Check we are logged in..
     const req = await checkLoggedIn(jwt);
+    userData = req;
 
-    if (!req || req.data.status !== "success") {
-      return returnProps(null, null, null);
-    }
-
-    const userData = req.data.data;
-    const imageRequest = await getUsersImages(jwt, userData);
-
-    if (imageRequest.data.status !== "success") {
-      return returnProps(null, null, null);
-    }
+    // Get users last X amount of images to view
+    images = await getUsersImages(jwt, userData);
 
     return {
       props: {
-        userData,
-        images: imageRequest.data.data,
+        userData: userData,
+        images: images,
+        recentImages: recentImages,
       },
     };
   } catch (error) {
-    return returnProps(null, null, null);
+    console.log(error);
+    return returnProps(null, null, null, null);
   }
 }
 

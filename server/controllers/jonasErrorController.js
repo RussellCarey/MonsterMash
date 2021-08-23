@@ -1,3 +1,6 @@
+//!
+//! LEARN MATERIAL FROM A COURSE ___ TRY TO IMPLEMENT THIS TO MY PROJECT IF NEEDED>>!!?!?!?
+
 const AppError = require("./../utils/appError");
 
 const handleCastErrorDB = (err) => {

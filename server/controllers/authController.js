@@ -68,3 +68,15 @@ exports.logout = (req, res, next) => {
     res.redirect("http://127.0.0.1:3000");
   });
 };
+
+exports.checkJWTAndSetUser = async (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) next();
+
+  const data = await jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) res.json({ status: "failed" });
+    req.user = user;
+
+    next();
+  });
+};
