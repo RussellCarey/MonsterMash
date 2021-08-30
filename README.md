@@ -54,7 +54,7 @@ Uses twitter login via passport.
 
 ## Status
 
-Project is: Unfinished and wont be completed. I plan to recreate the project ofrom the beginning to improve it in all aspects.
+Project is: Nearly completed, I need to improve the error handling and user notifications for said errors.
 
 ## Contact
 Created by [@RussellCarey](https://twitter.com/russellcareyy) - feel free to contact me about the project
