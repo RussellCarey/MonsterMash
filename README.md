@@ -1,13 +1,21 @@
 # Monster Mash
-A Next JS community monster creation drawing game.
+A Next JS Twitter community monster creation drawing game.
 
-Not mobile repsonsive fully.
+This game comes from a paper based drawing game I play with my students in elementary school.  
 
-![alt text](https://github.com/RussellCarey/Invoice-Manager/blob/master/client/s1.png)
-![alt text](https://github.com/RussellCarey/Invoice-Manager/blob/master/client/s2.png)
-![alt text](https://github.com/RussellCarey/Invoice-Manager/blob/master/client/s3.png)
-![alt text](https://github.com/RussellCarey/Invoice-Manager/blob/master/client/s4.png)
-![alt text](https://github.com/RussellCarey/Invoice-Manager/blob/master/client/s5.png)
+In this app you draw one section of a monster and it will randomly pair it with user created body parts.  
+
+If the combination has not yet been made, it will up save it and upload it to the twitter account!.  
+
+Uses twitter login via passport.
+
+
+![alt text](https://github.com/RussellCarey/MonsterMash/blob/master/client/s1.png)
+![alt text](https://github.com/RussellCarey/MonsterMash/blob/master/client/s2.png)
+![alt text](https://github.com/RussellCarey/MonsterMash/blob/master/client/s3.png)
+![alt text](https://github.com/RussellCarey/MonsterMash/blob/master/client/s4.png)
+![alt text](https://github.com/RussellCarey/MonsterMash/blob/master/client/s5.png)
+
 
 ## Table of contents
 
@@ -21,37 +29,32 @@ Not mobile repsonsive fully.
 
 ## Main Technologies
 
-- Stripe / Stripe API /CLI
 - Next JS
 - Mongo / Mongoose
+- React Canvas
+- Passport
+- Jimp
+- Twit
 - Node JS
-- Nodemailer
 - Express
 - Styled Components
 - Axios
 - Postman
-- Github
 
 ## Languages
 - JavaScript
 
 ## Features
 
-- Add a new invoice for a client.
-- Filter the main list by paid, pending or all.
-- Delete invoices or mark as paid.
-- On submitting invoice an email is sent to the payee.
-- The email has a link to a payment portal so they can pay their bill / invoice.
-- On paying the database will change the invoice status to paid automatically.
+- View communnity made monsters.
+- Draw your own head, body or legs and pair it with other users creations.
+- See your creation on the websites twitter account.
+- View your last 3 creations by clicking your name in the nav bar.
 
 
 ## Status
 
 Project is: Unfinished and wont be completed. I plan to recreate the project ofrom the beginning to improve it in all aspects.
-
-This was a project just for learning to use Stripe payment portals and to practice making a website / app with Next JS.  
-
-The Design was from a Front End Mentor Challenge.
 
 ## Contact
 Created by [@RussellCarey](https://twitter.com/russellcareyy) - feel free to contact me about the project
