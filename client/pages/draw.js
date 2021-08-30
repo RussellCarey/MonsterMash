@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useState,
-  useRef,
-  useContext,
-  useEffect,
-} from "react";
+import React, { Fragment, useState, useRef, useContext, useEffect } from "react";
 import Canvas from "../components/canvas";
 import { useRouter } from "next/dist/client/router";
 import ColorSwatches from "../components/ColorSwatches";
@@ -14,16 +8,7 @@ import { serverAddress, hostAddress } from "../data/env";
 import { checkLoggedIn, returnProps } from "./services/IndexServices";
 
 // Style components
-import {
-  Container,
-  CanvasContainer,
-  CanvasArea,
-  MessageWindow,
-  Message,
-  Button,
-  Toolbar,
-  InfoButton,
-} from "../components/styled/Draw.styled";
+import { Container, CanvasContainer, CanvasArea, MessageWindow, Message, Button, Toolbar, InfoButton } from "../components/styled/Draw.styled";
 
 // Imported componenents
 import { Cross } from "../components/styled/Main.styled";
@@ -31,11 +16,7 @@ import BrushSizes from "../components/brushSizes";
 import InfoModal from "../components/InfoModal";
 
 // Service functions
-import {
-  submitImageToDatabase,
-  getRandomSectionType,
-  returnHome,
-} from "./services/DrawServices";
+import { submitImageToDatabase, getRandomSectionType, returnHome } from "./services/DrawServices";
 
 // Main
 function Draw({ userData }) {
@@ -74,59 +55,23 @@ function Draw({ userData }) {
       {infoMessage && <InfoModal toggleState={setInfoMessage} />}
 
       {warningMessage && (
-        <InfoModal
-          toggleState={setWarningMessage}
-          message={
-            "Maybe spend a little more time drawing before you submit? ... Rome wasnt built in a day.. Or something.."
-          }
-        />
+        <InfoModal toggleState={setWarningMessage} message={"Maybe spend a little more time drawing before you submit? ... Rome wasnt built in a day.. Or something.."} />
       )}
 
       <Container>
         <CanvasContainer>
           <CanvasArea>
-            <Cross
-              position={"absolute"}
-              top={"-15px"}
-              right={"-15px"}
-              onClick={() => returnHome(router)}
-            >
+            <Cross position={"absolute"} top={"-15px"} right={"-15px"} onClick={() => returnHome(router)}>
               X
             </Cross>
-            <Cross
-              position={"absolute"}
-              top={"-15px"}
-              right={"20px"}
-              onClick={() => setInfoMessage(true)}
-            >
+            <Cross position={"absolute"} top={"-15px"} right={"20px"} onClick={() => setInfoMessage(true)}>
               i
             </Cross>
-            <Canvas
-              strokeWidth={brushWidth}
-              strokeColor={color}
-              canvasRef={CanvasRef}
-              sectionType={sectionType}
-            />
+            <Canvas strokeWidth={brushWidth} strokeColor={color} canvasRef={CanvasRef} sectionType={sectionType} />
           </CanvasArea>
           <Toolbar>
-            <ColorSwatches
-              onHandleClick={setColor}
-              setBrushWidth={setBrushWidth}
-            >
-              <Button
-                onClick={() =>
-                  submitImageToDatabase(
-                    userData,
-                    setLoading,
-                    CanvasRef,
-                    sectionType,
-                    router,
-                    setWarningMessage
-                  )
-                }
-              >
-                Submit Drawing
-              </Button>
+            <ColorSwatches onHandleClick={setColor} setBrushWidth={setBrushWidth}>
+              <Button onClick={() => submitImageToDatabase(userData, setLoading, CanvasRef, sectionType, router, setWarningMessage)}>Submit Drawing</Button>
             </ColorSwatches>
           </Toolbar>
         </CanvasContainer>

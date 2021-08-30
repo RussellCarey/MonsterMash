@@ -2,12 +2,7 @@ import axios from "axios";
 import React, { Fragment, useState } from "react";
 import styled from "styled-components";
 
-import {
-  getTypeImage,
-  createFullImage,
-  createCombinationToTwitter,
-  getUsersDrawing,
-} from "./services/MonsterMashServices";
+import { getTypeImage, createFullImage, createCombinationToTwitter, getUsersDrawing } from "./services/MonsterMashServices";
 import { returnProps } from "./services/IndexServices";
 
 const Container = styled.div`
@@ -38,10 +33,11 @@ const Image = styled.img`
   border-right: solid ${(props) => props.br} black;
   border-bottom: solid ${(props) => props.bb} black;
   border-left: solid ${(props) => props.bl} black;
-  ${(props) =>
-    props.boxshadow === true
-      ? `box-shadow: 0 15px 10px rgba(255, 255, 255, 0.1)`
-      : null}
+  ${(props) => (props.boxshadow === true ? `box-shadow: 0 15px 10px rgba(255, 255, 255, 0.1)` : null)}
+
+  @media (max-width: 700px) {
+    width: 70vw;
+  }
 `;
 
 const TextBox = styled.div`
@@ -51,6 +47,14 @@ const TextBox = styled.div`
   border-radius: 15px;
   background-color: white;
   box-shadow: 0 10px 20px rgba(255, 255, 255, 0.3);
+
+  @media (max-width: 700px) {
+    width: 90vw;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-wrap: wrap;
+  }
 `;
 
 const Button = styled.button`
@@ -82,49 +86,19 @@ export default function Mash({ data }) {
   return (
     <Container>
       <ImageContainer>
-        <Image
-          src={data && data.head}
-          bt={"3px"}
-          br={"3px"}
-          bl={"3px"}
-          bb={"0px"}
-        />
-        <Image
-          src={data && data.body}
-          bt={"0px"}
-          br={"3px"}
-          bl={"3px"}
-          bb={"0px"}
-        />
-        <Image
-          src={data && data.legs}
-          bt={"0px"}
-          br={"3px"}
-          bl={"3px"}
-          bb={"3px"}
-          boxshadow={true}
-        />
+        <Image src={data && data.head} bt={"3px"} br={"3px"} bl={"3px"} bb={"0px"} />
+        <Image src={data && data.body} bt={"0px"} br={"3px"} bl={"3px"} bb={"0px"} />
+        <Image src={data && data.legs} bt={"0px"} br={"3px"} bl={"3px"} bb={"3px"} />
       </ImageContainer>
       <TextBox>
-        Wow, what creations! What inspiration! -- Head by{" "}
-        <a
-          target="_blank"
-          href={`https://www.twitter.com/${data.headUsername}`}
-        >
+        Wow, what creations! What inspiration! Created by
+        <a target="_blank" href={`https://www.twitter.com/${data.headUsername}`}>
           <Button>@{data.headUsername}</Button>
         </a>
-        body by{"  "}
-        <a
-          target="_blank"
-          href={`https://www.twitter.com/${data.bodyUsername}`}
-        >
+        <a target="_blank" href={`https://www.twitter.com/${data.bodyUsername}`}>
           <Button>@{data.bodyUsername}</Button>
         </a>
-        and legs by{"  "}
-        <a
-          target="_blank"
-          href={`https://www.twitter.com/${data.legsUsername}`}
-        >
+        <a target="_blank" href={`https://www.twitter.com/${data.legsUsername}`}>
           <Button>@{data.legsUsername}</Button>
         </a>
       </TextBox>
@@ -145,11 +119,7 @@ export async function getServerSideProps({ res, req, query }) {
   const legsSectionData = await getTypeImage(usersImageData, "legs");
 
   // Create image
-  const fullImage = createFullImage(
-    headSectionData,
-    bodySectionData,
-    legsSectionData
-  );
+  const fullImage = createFullImage(headSectionData, bodySectionData, legsSectionData);
 
   // If we have a query - upload 3 parts of the image to the DB to check if it exists and to save / publish to twitter
   const combination = createCombinationToTwitter(query, fullImage);

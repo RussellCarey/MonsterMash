@@ -16,8 +16,7 @@ module.exports = (err, req, res, next) => {
     if (error.customMessage) {
       errorMessage = error.customMessage;
     } else {
-      errorMessage =
-        "Something unusual seems to have occured. Please try again or contact us if it persists!";
+      errorMessage = "Something unusual seems to have occured. Please try again or contact us if it persists!";
     }
 
     // In production throw user to error page if it warrents it

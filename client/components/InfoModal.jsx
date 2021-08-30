@@ -40,12 +40,7 @@ export default function BrushSizes({ message, toggleState }) {
     <Container>
       <Modal>
         {" "}
-        <Cross
-          top={"-15px"}
-          right={"-15px"}
-          position={"absolute"}
-          onClick={hideModal}
-        >
+        <Cross top={"-15px"} right={"-15px"} position={"absolute"} onClick={hideModal}>
           X
         </Cross>
         {!message ? (
@@ -54,19 +49,11 @@ export default function BrushSizes({ message, toggleState }) {
             <p>
               <u>Controls and tips: </u>
             </p>
-            <p>
-              You can choose your brush size and colors from the side panel. The
-              small brush is for the OUTLINE and details and the big for some
-              background color.
-            </p>
-            <p>
-              Be careful on using color, your color may not match the other
-              users sections!
-            </p>
+            <p>If you are using mobile, please turn your phone on its side. WIP</p>
+            <p>You can choose your brush size and colors from the side panel. The small brush is for the OUTLINE and details and the big for some background color.</p>
+            <p>Be careful on using color, your color may not match the other users sections!</p>
             <p>You can press Z to undo your last stroke and R to redo.</p>
-            <p>
-              Make sure to connect the light red markers on the canvas!
-            </p>{" "}
+            <p>Make sure to connect the light red markers on the canvas!</p>{" "}
           </Fragment>
         ) : (
           message

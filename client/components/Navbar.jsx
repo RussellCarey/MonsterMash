@@ -24,6 +24,12 @@ const Container = styled.nav`
   align-items: center;
 
   border-bottom: solid 3px black;
+
+  @media (max-width: 700px) {
+    padding: 20px;
+    height: min-content;
+    flex-direction: column;
+  }
 `;
 
 const Button = styled.button`
@@ -47,6 +53,10 @@ const Button = styled.button`
 
   &:hover {
     cursor: pointer;
+  }
+
+  @media (max-width: 700px) {
+    margin-bottom: 10px;
   }
 `;
 
@@ -93,6 +103,11 @@ const ButtonsArea = styled.div`
   flex-direction: row;
 
   cursor: pointer;
+
+  @media (max-width: 700px) {
+    height: min-content;
+    flex-direction: column;
+  }
 `;
 
 export default function Navbar({ children, userData, drawings }) {

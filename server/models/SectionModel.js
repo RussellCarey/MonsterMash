@@ -9,7 +9,6 @@ const SectionModel = new mongoose.Schema({
   },
   imageString: {
     type: String,
-    required: [true, "Image string is empty."],
   },
   date: {
     type: Date,
